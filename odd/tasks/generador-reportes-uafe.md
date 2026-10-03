@@ -1,8 +1,8 @@
 # ODD — Generador Estandarizado de Reportes UAFE
 
-**Estado:** especificación congelada v1.0
+**Estado:** implementación verificada (con brechas)
 **Creado:** 2026-10-02 · **Actualizado:** 2026-10-02
-**Ruta de trabajo:** directa (inline) — entregables documentales, sin código
+**Ruta de trabajo:** ODD — especificación congelada v1.0 + implementación Node.js
 
 ---
 
@@ -29,7 +29,7 @@ Cada analista arma su presentación en PowerPoint sin uniformidad de forma ni de
 ## Restricciones
 
 - Repositorio Git inicializado y publicado: https://github.com/rinita520/Reportescomite (commit `36ce58c`).
-- Stack técnico aún sin definir.
+- Stack decidido e implementado: Node.js v24 + SheetJS 0.20.3 + pptxgenjs 4 + express 5 + node:test.
 - Único insumo de partida: `problema_1_reporte_uafe.md`.
 - Las especificaciones usan el formato interno real; no existe instructivo normativo externo.
 
@@ -57,7 +57,7 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 - [x] T7 — Formato real del resumen de movimientos (dos vistas + muestra); P7 cerrado → v0.6
 - [x] T8 — Muestra sin criterio fijo; P8 cerrado; D10 → v0.7
 - [x] T9 — Congelar y aprobar la especificación v1.0
-- [ ] T10 — Fase de implementación: stack (P5), retención (P6), volumen (P4), diseño técnico
+- [x] T10 — Fase de implementación ejecutada (I1–I6); brechas pendientes en I8–I12
 
 ## Evidencia de verificación
 
@@ -83,10 +83,28 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 - [x] I3 — Interfaz web (`express` + `multer`): cargar XLSX, generar y descargar el PPTX (RNF-07) → commit `e6fbcfd` (13 tests en verde)
 - [x] I4 — Metadatos, versionado y trazabilidad (RF-06, RF-07, RF-09, RN-04) → commit `523f7a0` (registro JSON + hash SHA-256 + consulta `/reportes`; 20 tests en verde)
 - [x] I5 — Ejemplo de entrada (XLSX), README y plantilla documentada → commit `7e8c8ad` (23 tests en verde; `examples/ejemplo.xlsx` + `docs/plantilla.md`)
-- [ ] I6 — Verificación final de la implementación
+- [x] I6 — Verificación final independiente: 23/23 tests, `npm audit` 0, flujo HTTP end-to-end OK (hash coincide), 11 slides → **verified-with-concerns**
 - [x] I7 — Vulnerabilidad de `xlsx` resuelta: migrado a SheetJS oficial **v0.20.3** desde el CDN (`npm audit` = 0 vulnerabilidades). Requirió wiring de `fs` para ESM en `src/sheetjs.js`.
+
+## Brechas detectadas por la verificación (I6)
+
+Requisitos de la spec v1.0 **no implementados**:
+
+- **RF-12 (Alta)** — Un reporte debe incluir un bloque por caso; hoy el sistema asume **un XLSX = un caso** (`loader` colapsa `Casos`/`Clientes` a la primera fila).
+- **RF-08 (Media)** — Roles y permisos (analista, oficial, Comité): no implementado.
+- **RF-11 (Media)** — Editar la plantilla sin tocar código: la estética está fija en `src/theme.js`.
+- **RF-09 (Media)** — Filtro de reportes por período/caso: `/reportes` lista todo, sin filtros.
+- **RF-01 (Alta)** — CSV: solo se soporta XLSX; un CSV de una sola hoja falla.
+
+Cobertura de tests mejorable: el renderer afirma `slideCount >= 10` (no `== 11`), sin asserts de orden, gráficos ni fidelidad del contenido (RF-14).
+
+- [ ] I8 — RF-12: soporte multi-caso (un reporte con varios bloques)
+- [ ] I9 — RF-08: roles y permisos
+- [ ] I10 — RF-11: plantilla editable sin código
+- [ ] I11 — RF-09: filtro de reportes por período/caso
+- [ ] I12 — Endurecer tests del renderer (orden, gráficos, fidelidad)
 
 ## Próximo paso
 
-Ejecutar I6: verificación final de la implementación (suite completa + smoke end-to-end).
+Decidir con el usuario: implementar las brechas I8–I12 o aceptarlas como diferidas a v1.1.
 
