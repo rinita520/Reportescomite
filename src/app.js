@@ -1,13 +1,14 @@
 import express from 'express';
 import multer from 'multer';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadCaso } from './loader.js';
 import { validateCaso } from './validator.js';
 import { renderReport } from './renderer.js';
+import { createRegistry } from './registry.js';
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(currentDir, '..', 'output');
@@ -89,6 +90,12 @@ function layout({ title, body }) {
     .errores ul { margin: 0; padding-left: 1.2rem; }
     .errores li { margin-bottom: .35rem; }
     a.volver { display: inline-block; margin-top: 1.25rem; color: #1f6feb; }
+    table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    th, td { text-align: left; padding: .45rem .35rem; border-bottom: 1px solid #e4eaf1; vertical-align: top; }
+    th { color: #52606d; text-transform: uppercase; font-size: .68rem; letter-spacing: .04em; }
+    code { font-size: .78rem; background: #f0f4f8; padding: .1rem .3rem; border-radius: 4px; }
+    td a { color: #1f6feb; text-decoration: none; }
+    .vacio { color: #52606d; }
   </style>
 </head>
 <body>
@@ -125,7 +132,8 @@ function formPage() {
         <input type="text" id="id" name="id" placeholder="REP-2026-08-C001">
       </fieldset>
       <button type="submit">Generar reporte</button>
-    </form>`,
+    </form>
+    <a class="volver" href="/reportes">Ver reportes generados</a>`,
   });
 }
 
@@ -148,6 +156,69 @@ ${items}
   });
 }
 
+/** Human-readable file size (RF-06: metadata shown to non-technical users). */
+function formatBytes(bytes) {
+  const value = Number(bytes);
+  if (!Number.isFinite(value) || value <= 0) return '—';
+  if (value < 1024) return `${value} B`;
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Registry listing (RF-09): every recorded report newest-first. */
+function reportsPage(entries) {
+  const body =
+    entries.length === 0
+      ? `    <h1>Reportes generados</h1>
+    <p class="vacio">Aún no hay reportes registrados.</p>
+    <a class="volver" href="/">Volver al formulario</a>`
+      : `    <h1>Reportes generados</h1>
+    <p class="subtitle">Historial de generaciones y reprocesos (RF-07).</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Identificador</th>
+          <th>Período</th>
+          <th>Autor</th>
+          <th>Versión</th>
+          <th>Tamaño</th>
+          <th>Hash</th>
+        </tr>
+      </thead>
+      <tbody>
+${entries
+  .map((entry) => {
+    const id = encodeURIComponent(entry.id);
+    const shortHash = String(entry.hash ?? '').slice(0, 12);
+    return `        <tr>
+          <td>${escapeHtml(entry.fecha_generacion)}</td>
+          <td><a href="/reportes/${id}">${escapeHtml(entry.report_id)}</a></td>
+          <td>${escapeHtml(entry.periodo)}</td>
+          <td>${escapeHtml(entry.autor)}</td>
+          <td>${escapeHtml(entry.version)}</td>
+          <td>${escapeHtml(formatBytes(entry.bytes))}</td>
+          <td><code>${escapeHtml(shortHash)}</code></td>
+        </tr>`;
+  })
+  .join('\n')}
+      </tbody>
+    </table>
+    <a class="volver" href="/">Volver al formulario</a>`;
+
+  return layout({ title: 'Reportes generados', body });
+}
+
+/** 404 page for an unknown or unavailable report (RF-09). */
+function notFoundPage() {
+  return layout({
+    title: 'Reporte no encontrado',
+    body: `    <h1>Reporte no encontrado</h1>
+    <p>No se encontró el reporte solicitado en el registro.</p>
+    <a class="volver" href="/reportes">Volver al listado de reportes</a>`,
+  });
+}
+
 /** Build renderer meta from the optional form fields (blank values omitted). */
 function buildMeta(fields) {
   const meta = {};
@@ -161,7 +232,7 @@ function buildMeta(fields) {
 }
 
 /** POST /generar: validate the uploaded workbook and stream back the PPTX. */
-async function generar(req, res) {
+async function generar(req, res, { outputDir, registry }) {
   const file = req.file;
   if (!file || !file.buffer || file.buffer.length === 0) {
     res.status(400).type('html').send(
@@ -202,14 +273,31 @@ async function generar(req, res) {
       return;
     }
 
-    await mkdir(OUTPUT_DIR, { recursive: true });
+    await mkdir(outputDir, { recursive: true });
     // RN-04: every generation is a new file; never overwrite a previous one.
-    const outputPath = join(OUTPUT_DIR, `reporte-${randomUUID()}.pptx`);
+    const outputPath = join(outputDir, `reporte-${randomUUID()}.pptx`);
     const meta = buildMeta(req.body);
 
-    await renderReport(caso, { outputPath, meta });
+    const { slideCount } = await renderReport(caso, { outputPath, meta });
 
     const pptx = await readFile(outputPath);
+
+    // RF-06 / RF-07: record the metadata of every generation, appending a new
+    // version instead of overwriting the previous one (RN-04).
+    const reportId = meta.id ?? caso?.caso?.id_caso ?? 'N/D';
+    await registry.append({
+      report_id: reportId,
+      archivo: basename(outputPath),
+      hash: createHash('sha256').update(pptx).digest('hex'),
+      autor: meta.autor ?? 'No especificado',
+      periodo: meta.periodo ?? caso?.caso?.periodo ?? 'N/D',
+      version: meta.version ?? 'v1.0',
+      confidencialidad: meta.confidencialidad ?? 'Confidencial',
+      casos: [caso?.caso?.id_caso].filter(Boolean),
+      slide_count: slideCount,
+      bytes: pptx.length,
+    });
+
     const downloadName = `reporte-${meta.periodo ?? 'uafe'}.pptx`;
     res
       .status(200)
@@ -235,8 +323,16 @@ async function generar(req, res) {
 /**
  * Build the Express app for the local UAFE report generator (RNF-07).
  * Returns a configured app so tests can `listen(0)` on an ephemeral port.
+ *
+ * @param {{ outputDir?: string, registry?: object }} [options] Injectable
+ *   output directory and registry so tests never touch the real `output/`.
  */
-export function createApp() {
+export function createApp(options = {}) {
+  const outputDir = options.outputDir ?? OUTPUT_DIR;
+  const registry =
+    options.registry ??
+    createRegistry({ filePath: join(outputDir, 'registry.json') });
+
   const app = express();
   app.use(express.urlencoded({ extended: false }));
 
@@ -264,8 +360,52 @@ export function createApp() {
         );
         return;
       }
-      generar(req, res).catch(next);
+      generar(req, res, { outputDir, registry }).catch(next);
     });
+  });
+
+  // RF-09: list every recorded report (newest first).
+  app.get('/reportes', async (req, res, next) => {
+    try {
+      const entries = await registry.list();
+      res.status(200).type('html').send(reportsPage(entries));
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // RF-07: download a stored report by its registry id.
+  app.get('/reportes/:id', async (req, res, next) => {
+    try {
+      const entry = await registry.get(req.params.id);
+      if (!entry || !entry.archivo) {
+        res.status(404).type('html').send(notFoundPage());
+        return;
+      }
+
+      let pptx;
+      try {
+        // `basename` prevents escaping `outputDir` via a tampered registry.
+        pptx = await readFile(join(outputDir, basename(entry.archivo)));
+      } catch (error) {
+        if (error.code === 'ENOENT') {
+          res.status(404).type('html').send(notFoundPage());
+          return;
+        }
+        throw error;
+      }
+
+      res
+        .status(200)
+        .set('Content-Type', PPTX_CONTENT_TYPE)
+        .set(
+          'Content-Disposition',
+          `attachment; filename="${basename(entry.archivo).replaceAll('"', '')}"`,
+        )
+        .send(pptx);
+    } catch (error) {
+      next(error);
+    }
   });
 
   // Final safety net: never crash, always answer with HTML.
