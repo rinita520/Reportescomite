@@ -78,14 +78,15 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 **Stack decidido (2026-10-02):** Node.js v24 + `xlsx` (SheetJS) + `pptxgenjs` + `express` + `node:test`.
 **Motivo:** Python no está instalado en la máquina; Node sí (v24.19.0). Con Node se puede construir y verificar con tests.
 
-- [ ] I1 — Núcleo de datos: `package.json`, modelos, `loader` de XLSX y validador de los 8 temas (RF-01, RF-02, RF-10) + tests
+- [x] I1 — Núcleo de datos: `package.json`, modelos, `loader` de XLSX y validador de los 8 temas (RF-01, RF-02, RF-10) + tests → commit `337f6c0` (7 tests en verde)
 - [ ] I2 — Renderizador PPTX con plantilla única y resumen gráfico (`pptxgenjs`) (RF-03, RF-04, RF-05, RF-13, RF-14)
 - [ ] I3 — Interfaz web (`express`): cargar XLSX, generar y descargar el PPTX (RNF-07)
 - [ ] I4 — Metadatos, versionado y trazabilidad (RF-06, RF-07, RN-04)
 - [ ] I5 — Ejemplo de entrada (XLSX), README y plantilla documentada
 - [ ] I6 — Verificación final de la implementación
+- [ ] I7 — Deuda técnica: `npm audit` reporta 1 vulnerabilidad alta en `xlsx` (prototype pollution + ReDoS, sin fix en npm). Evaluar SheetJS desde el CDN oficial o migrar a `exceljs`.
 
 ## Próximo paso
 
-Ejecutar I1: núcleo de datos con tests.
+Ejecutar I2: renderizador PPTX con plantilla y resumen gráfico.
 
