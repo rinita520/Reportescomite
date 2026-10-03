@@ -1,4 +1,4 @@
-import XLSX from 'xlsx';
+import XLSX from './sheetjs.js';
 import { SHEETS, SHEET_KEYS, SINGULAR_SHEETS } from './models.js';
 
 /**

@@ -84,7 +84,7 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 - [ ] I4 — Metadatos, versionado y trazabilidad (RF-06, RF-07, RN-04)
 - [ ] I5 — Ejemplo de entrada (XLSX), README y plantilla documentada
 - [ ] I6 — Verificación final de la implementación
-- [ ] I7 — Deuda técnica: `npm audit` reporta 1 vulnerabilidad alta en `xlsx` (prototype pollution + ReDoS, sin fix en npm). Evaluar SheetJS desde el CDN oficial o migrar a `exceljs`.
+- [x] I7 — Vulnerabilidad de `xlsx` resuelta: migrado a SheetJS oficial **v0.20.3** desde el CDN (`npm audit` = 0 vulnerabilidades). Requirió wiring de `fs` para ESM en `src/sheetjs.js`.
 
 ## Próximo paso
 
