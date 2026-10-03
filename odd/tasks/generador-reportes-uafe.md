@@ -81,12 +81,12 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 - [x] I1 — Núcleo de datos: `package.json`, modelos, `loader` de XLSX y validador de los 8 temas (RF-01, RF-02, RF-10) + tests → commit `337f6c0` (7 tests en verde)
 - [x] I2 — Renderizador PPTX con plantilla única y resumen gráfico (`pptxgenjs`) (RF-03, RF-04, RF-05, RF-13, RF-14) → commit `d36207d` (11 slides, 9 tests en verde; `override` de `image-size@2.0.4`)
 - [x] I3 — Interfaz web (`express` + `multer`): cargar XLSX, generar y descargar el PPTX (RNF-07) → commit `e6fbcfd` (13 tests en verde)
-- [ ] I4 — Metadatos, versionado y trazabilidad (RF-06, RF-07, RN-04)
+- [x] I4 — Metadatos, versionado y trazabilidad (RF-06, RF-07, RF-09, RN-04) → commit `523f7a0` (registro JSON + hash SHA-256 + consulta `/reportes`; 20 tests en verde)
 - [ ] I5 — Ejemplo de entrada (XLSX), README y plantilla documentada
 - [ ] I6 — Verificación final de la implementación
 - [x] I7 — Vulnerabilidad de `xlsx` resuelta: migrado a SheetJS oficial **v0.20.3** desde el CDN (`npm audit` = 0 vulnerabilidades). Requirió wiring de `fs` para ESM en `src/sheetjs.js`.
 
 ## Próximo paso
 
-Ejecutar I4: metadatos, versionado y trazabilidad (RF-06, RF-07, RN-04).
+Ejecutar I5: ejemplo de entrada (XLSX), README y plantilla documentada.
 
