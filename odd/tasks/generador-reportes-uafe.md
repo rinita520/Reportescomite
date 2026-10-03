@@ -1,6 +1,6 @@
 # ODD — Generador Estandarizado de Reportes UAFE
 
-**Estado:** implementación verificada (con brechas)
+**Estado:** implementación v1.0 cerrada (brechas diferidas a v1.1)
 **Creado:** 2026-10-02 · **Actualizado:** 2026-10-02
 **Ruta de trabajo:** ODD — especificación congelada v1.0 + implementación Node.js
 
@@ -98,6 +98,8 @@ Requisitos de la spec v1.0 **no implementados**:
 
 Cobertura de tests mejorable: el renderer afirma `slideCount >= 10` (no `== 11`), sin asserts de orden, gráficos ni fidelidad del contenido (RF-14).
 
+### Diferidas a v1.1 (decisión del usuario, 2026-10-02)
+
 - [ ] I8 — RF-12: soporte multi-caso (un reporte con varios bloques)
 - [ ] I9 — RF-08: roles y permisos
 - [ ] I10 — RF-11: plantilla editable sin código
@@ -106,5 +108,5 @@ Cobertura de tests mejorable: el renderer afirma `slideCount >= 10` (no `== 11`)
 
 ## Próximo paso
 
-Decidir con el usuario: implementar las brechas I8–I12 o aceptarlas como diferidas a v1.1.
+v1.0 cerrada. La v1.1 toma I8–I12 y los pendientes P4 (volumen real) y P6 (retención de reportes).
 
