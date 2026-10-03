@@ -80,7 +80,7 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 
 - [x] I1 — Núcleo de datos: `package.json`, modelos, `loader` de XLSX y validador de los 8 temas (RF-01, RF-02, RF-10) + tests → commit `337f6c0` (7 tests en verde)
 - [x] I2 — Renderizador PPTX con plantilla única y resumen gráfico (`pptxgenjs`) (RF-03, RF-04, RF-05, RF-13, RF-14) → commit `d36207d` (11 slides, 9 tests en verde; `override` de `image-size@2.0.4`)
-- [ ] I3 — Interfaz web (`express`): cargar XLSX, generar y descargar el PPTX (RNF-07)
+- [x] I3 — Interfaz web (`express` + `multer`): cargar XLSX, generar y descargar el PPTX (RNF-07) → commit `e6fbcfd` (13 tests en verde)
 - [ ] I4 — Metadatos, versionado y trazabilidad (RF-06, RF-07, RN-04)
 - [ ] I5 — Ejemplo de entrada (XLSX), README y plantilla documentada
 - [ ] I6 — Verificación final de la implementación
@@ -88,5 +88,5 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 
 ## Próximo paso
 
-Ejecutar I3: interfaz web (`express`) para cargar el XLSX, generar y descargar el PPTX.
+Ejecutar I4: metadatos, versionado y trazabilidad (RF-06, RF-07, RN-04).
 
