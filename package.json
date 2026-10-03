@@ -6,6 +6,7 @@
   "description": "Generador Estandarizado de Reportes UAFE",
   "scripts": {
     "start": "node src/server.js",
+    "example": "node examples/generate-example.js",
     "test": "node --test"
   },
   "dependencies": {
