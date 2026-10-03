@@ -1,0 +1,13 @@
+{
+  "name": "reportes-comite",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generador Estandarizado de Reportes UAFE",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}
