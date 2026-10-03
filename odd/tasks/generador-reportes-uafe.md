@@ -28,7 +28,8 @@ Cada analista arma su presentación en PowerPoint sin uniformidad de forma ni de
 
 ## Restricciones
 
-- No hay repositorio Git ni stack técnico definido todavía.
+- Repositorio Git inicializado y publicado: https://github.com/rinita520/Reportescomite (commit `36ce58c`).
+- Stack técnico aún sin definir.
 - Único insumo de partida: `problema_1_reporte_uafe.md`.
 - Las especificaciones usan el formato interno real; no existe instructivo normativo externo.
 
@@ -72,6 +73,19 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 | T8 | v0.7 muestra sin criterio fijo; D10; P8 cerrado | OK |
 | T9 | v1.0 congelada con changelog (sección 15) y P1 cerrado | OK |
 
+## Fase de implementación — stack: Node.js
+
+**Stack decidido (2026-10-02):** Node.js v24 + `xlsx` (SheetJS) + `pptxgenjs` + `express` + `node:test`.
+**Motivo:** Python no está instalado en la máquina; Node sí (v24.19.0). Con Node se puede construir y verificar con tests.
+
+- [ ] I1 — Núcleo de datos: `package.json`, modelos, `loader` de XLSX y validador de los 8 temas (RF-01, RF-02, RF-10) + tests
+- [ ] I2 — Renderizador PPTX con plantilla única y resumen gráfico (`pptxgenjs`) (RF-03, RF-04, RF-05, RF-13, RF-14)
+- [ ] I3 — Interfaz web (`express`): cargar XLSX, generar y descargar el PPTX (RNF-07)
+- [ ] I4 — Metadatos, versionado y trazabilidad (RF-06, RF-07, RN-04)
+- [ ] I5 — Ejemplo de entrada (XLSX), README y plantilla documentada
+- [ ] I6 — Verificación final de la implementación
+
 ## Próximo paso
 
-Especificación cerrada. La fase siguiente (fuera del alcance de ODD-spec) es la implementación: definir stack (P5), retención (P6), volumen (P4) y el diseño técnico.
+Ejecutar I1: núcleo de datos con tests.
+
