@@ -79,7 +79,7 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 **Motivo:** Python no está instalado en la máquina; Node sí (v24.19.0). Con Node se puede construir y verificar con tests.
 
 - [x] I1 — Núcleo de datos: `package.json`, modelos, `loader` de XLSX y validador de los 8 temas (RF-01, RF-02, RF-10) + tests → commit `337f6c0` (7 tests en verde)
-- [ ] I2 — Renderizador PPTX con plantilla única y resumen gráfico (`pptxgenjs`) (RF-03, RF-04, RF-05, RF-13, RF-14)
+- [x] I2 — Renderizador PPTX con plantilla única y resumen gráfico (`pptxgenjs`) (RF-03, RF-04, RF-05, RF-13, RF-14) → commit `d36207d` (11 slides, 9 tests en verde; `override` de `image-size@2.0.4`)
 - [ ] I3 — Interfaz web (`express`): cargar XLSX, generar y descargar el PPTX (RNF-07)
 - [ ] I4 — Metadatos, versionado y trazabilidad (RF-06, RF-07, RN-04)
 - [ ] I5 — Ejemplo de entrada (XLSX), README y plantilla documentada
@@ -88,5 +88,5 @@ Elementos estructurales: Portada y Pie de trazabilidad.
 
 ## Próximo paso
 
-Ejecutar I2: renderizador PPTX con plantilla y resumen gráfico.
+Ejecutar I3: interfaz web (`express`) para cargar el XLSX, generar y descargar el PPTX.
 
