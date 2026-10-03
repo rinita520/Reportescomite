@@ -5,9 +5,12 @@
   "type": "module",
   "description": "Generador Estandarizado de Reportes UAFE",
   "scripts": {
+    "start": "node src/server.js",
     "test": "node --test"
   },
   "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.4.0",
     "pptxgenjs": "^4.0.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
